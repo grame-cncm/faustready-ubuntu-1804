@@ -13,14 +13,12 @@
 FROM ubuntu:18.04
 
 ########################################################################
-# We first install all the dependencies but Android
+# Install all the dependencies but Android
 ########################################################################
 
 # We first install all the ubuntu packages
 
-RUN apt-get update
-
-RUN DEBIAN_FRONTEND='noninteractive' apt-get install -y --no-install-recommends \
+RUN apt-get update; DEBIAN_FRONTEND='noninteractive' apt-get install -y --no-install-recommends \
     build-essential pkg-config git cmake libmicrohttpd-dev llvm-6.0 llvm-6.0-dev libssl-dev \
     software-properties-common zip unzip wget ncurses-dev libsndfile-dev libedit-dev libcurl4-openssl-dev vim-common \
     libasound2-dev libjack-jackd2-dev libgtk2.0-dev libqt4-dev \
@@ -62,35 +60,32 @@ RUN ln -s /usr/lib/x86_64-linux-gnu/qt5/bin/qmake /usr/bin/qmake-qt5
 
 
 ########################################################################
-# Then we install Android
+# Install Android in /android
 ########################################################################
 
-RUN wget https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip; \
-    mkdir android; \
-    unzip sdk-tools-linux-4333796.zip -d android; \
-    install -d /root/.android/; \
-    touch /root/.android/repositories.cfg
+RUN wget https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip; \
+    mkdir -p /android/sdk/cmdline-tools; \
+    unzip commandlinetools-linux-6858069_latest.zip; \
+    mv cmdline-tools /android/sdk/cmdline-tools/tools
 
-## sign licenses
-RUN	yes | android/tools/bin/sdkmanager --licenses
 
-## Android tools
-RUN android/tools/bin/sdkmanager "cmake;3.6.4111459"
-RUN android/tools/bin/sdkmanager "extras;android;m2repository" 
-RUN android/tools/bin/sdkmanager "ndk-bundle" 
-RUN android/tools/bin/sdkmanager "patcher;v4" 
-RUN android/tools/bin/sdkmanager "platform-tools" 
-RUN android/tools/bin/sdkmanager "platforms;android-27" 
-RUN android/tools/bin/sdkmanager "tools" 
-RUN android/tools/bin/sdkmanager "build-tools;25.0.3"  
-RUN android/tools/bin/sdkmanager "build-tools;28.0.3"  
-RUN yes | android/tools/bin/sdkmanager --licenses
+RUN	yes | /android/sdk/cmdline-tools/tools/bin/sdkmanager --licenses
+RUN	/android/sdk/cmdline-tools/tools/bin/sdkmanager "build-tools;29.0.2" "cmake;3.10.2.4988404" "platforms;android-30" "extras;android;m2repository" "ndk;21.1.6352462"
 
-## Creates expected environment for faust2android and faust2smarkeyb
-ENV ANDROID_HOME=/android ANDROID_NDK_HOME=/android/ndk-bundle
 RUN install -d /opt/android; \
-    ln -s /android /opt/android/sdk; \
-    ln -s /android/ndk-bundle /opt/android/ndk
+    ln -s /android/sdk /opt/android/sdk; \
+    ln -s /android/sdk/ndk-bundle /opt/android/ndk
 
-## Install docker to be able to call other docker image
-#RUN apt-get update && apt-get install -y  docker.io
+ENV ANDROID_HOME=/opt/android/sdk ANDROID_NDK_HOME=/opt/android/ndk
+
+
+########################################################################
+# Install gradle-6.5. The version should be the same that the one 
+# tested by faust2android and faust2smartkeyb
+########################################################################
+
+RUN wget https\://services.gradle.org/distributions/gradle-6.5-bin.zip
+RUN mkdir /opt/gradle; unzip -d /opt/gradle gradle-6.5-bin.zip
+
+# set PATH
+ENV PATH=$PATH:/opt/gradle/gradle-6.5/bin
