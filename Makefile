@@ -1,11 +1,13 @@
+REPO = "grame/faustready-ubuntu-1804"
+
 build:
-	docker build --squash -t grame/faust .
+	docker build -t $(REPO) .
 
 push:
-	docker push grame/faust
+	docker push $(REPO)
 
 test:
-	docker run grame/faust
+	docker run -it $(REPO) bash
 
 help:
 	@echo " 'build' : builds the docker image"
