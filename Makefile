@@ -11,6 +11,6 @@ test:
 
 help:
 	@echo " 'build' : builds the docker image"
-	@echo " 'test'  : run the docker image, equivalent to faust -v"
+	@echo " 'test'  : run bash the docker image"
 	@echo " 'push'  : push the docker image to docker repository"
  
