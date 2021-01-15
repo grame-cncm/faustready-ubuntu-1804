@@ -70,19 +70,24 @@ RUN wget https://dl.google.com/android/repository/commandlinetools-linux-6858069
 
 
 RUN	yes | /android/sdk/cmdline-tools/tools/bin/sdkmanager --licenses
-RUN	/android/sdk/cmdline-tools/tools/bin/sdkmanager "build-tools;29.0.2" "cmake;3.10.2.4988404" "platforms;android-30" "extras;android;m2repository" "ndk;21.1.6352462"
+RUN	/android/sdk/cmdline-tools/tools/bin/sdkmanager "build-tools;29.0.2"
+RUN	/android/sdk/cmdline-tools/tools/bin/sdkmanager "cmake;3.10.2.4988404"
+RUN	/android/sdk/cmdline-tools/tools/bin/sdkmanager "platforms;android-30" 
+RUN	/android/sdk/cmdline-tools/tools/bin/sdkmanager "extras;android;m2repository" 
+RUN	/android/sdk/cmdline-tools/tools/bin/sdkmanager "ndk;21.1.6352462"
 
 RUN install -d /opt/android; \
     ln -s /android/sdk /opt/android/sdk; \
-    ln -s /android/sdk/ndk-bundle /opt/android/ndk
+    ln -s /android/sdk/ndk/21.1.6352462/ /opt/android/ndk
 
-ENV ANDROID_HOME=/opt/android/sdk ANDROID_NDK_HOME=/opt/android/ndk
+ENV ANDROID_HOME=/opt/android/sdk 
+ENV ANDROID_NDK_HOME=/opt/android/ndk
 
 
-########################################################################
-# Install gradle-6.5. The version should be the same that the one 
-# tested by faust2android and faust2smartkeyb
-########################################################################
+# ########################################################################
+# # Install gradle-6.5. The version should be the same that the one 
+# # tested by faust2android and faust2smartkeyb
+# ########################################################################
 
 RUN wget https\://services.gradle.org/distributions/gradle-6.5-bin.zip
 RUN mkdir /opt/gradle; unzip -d /opt/gradle gradle-6.5-bin.zip
